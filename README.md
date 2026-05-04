@@ -29,4 +29,4 @@ jobs:
         run: go test ./... || true
 
       - name: Build Docker image
-        run: docker build -t contact-app .
+        run: docker build -t go-form .
