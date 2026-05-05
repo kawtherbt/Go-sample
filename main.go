@@ -34,13 +34,13 @@ func triggerPipeline(c Contact) error {
 		return err
 	}
 
-	token := os.Getenv("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")
+	token := os.Getenv("GITHUB_TOKEN")
 	if token == "" {
 		return fmt.Errorf("GITHUB_TOKEN not set")
 	}
 
 	req.Header.Set("Accept", "application/vnd.github+json")
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Authorization", "Bearer "+"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")
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
