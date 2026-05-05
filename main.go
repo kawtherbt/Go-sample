@@ -33,11 +33,9 @@ func contactHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	// serve static files
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/", fs)
 
-	// API route
 	http.HandleFunc("/contact", contactHandler)
 
 	fmt.Println("Server running on http://localhost:8080")
