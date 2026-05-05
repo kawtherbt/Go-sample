@@ -34,7 +34,7 @@ func triggerPipeline(c Contact) error {
 		return err
 	}
 
-	token := os.Getenv("GITHUB_TOKEN")
+	token := os.Getenv("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")
 	if token == "" {
 		return fmt.Errorf("GITHUB_TOKEN not set")
 	}
