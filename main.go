@@ -40,7 +40,7 @@ func triggerPipeline(c Contact) error {
 	}
 
 	req.Header.Set("Accept", "application/vnd.github+json")
-	req.Header.Set("Authorization", "Bearer "+"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")
+	req.Header.Set("Authorization", "Bearer "+"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")
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}

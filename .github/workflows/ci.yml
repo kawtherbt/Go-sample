@@ -1,6 +1,6 @@
 name: Go CI 
 env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_TOKEN: ${{ "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" }}
 on:
   push:
     branches:
