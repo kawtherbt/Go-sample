@@ -9,7 +9,6 @@ import (
 	"os"
 )
 
-// Contact struct
 type Contact struct {
 	Name    string `json:"name"`
 	Email   string `json:"email"`
@@ -17,9 +16,8 @@ type Contact struct {
 }
 
 func triggerPipeline(c Contact) error {
-	url := "https://api.github.com/repos/kawtherbt/Go-sample/dispatches"
+	url := "https://api.github.com/kawtherbt/Go-sample/dispatches"
 
-	// Payload with form data
 	payloadMap := map[string]interface{}{
 		"event_type": "form_submitted",
 		"client_payload": map[string]string{
@@ -97,3 +95,7 @@ func main() {
 	fmt.Println("Server running on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
+
+
+
+
