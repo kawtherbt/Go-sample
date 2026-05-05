@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"bytes"
 )
 
 type Contact struct {
@@ -40,4 +41,20 @@ func main() {
 
 	fmt.Println("Server running on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+
+func triggerPipeline() {
+	url := "https://api.github.com/repos/kawtherbt/Go-sample/dispatches"
+
+	payload := []byte(`{
+		"event_type": "form_submitted"
+	}`)
+
+	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(payload))
+	req.Header.Set("Accept", "application/vnd.github+json")
+	req.Header.Set("Authorization", "Bearer YOUR_GITHUB_TOKEN")
+
+	client := &http.Client{}
+	client.Do(req)
 }
