@@ -29,5 +29,5 @@ jobs:
       - name: Run tests
         run: go test ./... || true
 
-      # - name: Build Docker image
-      #   run: docker build -t go-form .
+      - name: Build Docker image
+        run: docker build -t go-form .
