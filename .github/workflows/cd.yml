@@ -63,4 +63,4 @@ jobs:
      
       - name: Get ArgoCD password
         run: |
-          kubectl get secret argocd-initial-admin-secret -n go-sample-argocd -o jsonpath="{.data.password}" | base64 -d
+          kubectl get secret argocd-initial-admin-secret -n go-sample-argocd -o jsonpath="{.data.password}" | base64 -d 
