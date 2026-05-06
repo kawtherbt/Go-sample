@@ -25,7 +25,7 @@ func triggerPipeline(c Contact) error {
 
 	// 1. Setup Authentication
 	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: os.Getenv("TOKEN")}, // 👈 keep env, not hardcoded
+		&oauth2.Token{AccessToken: "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"}, 
 	)
 	tc := oauth2.NewClient(ctx, ts)
 
