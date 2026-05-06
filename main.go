@@ -16,7 +16,7 @@ type Contact struct {
 }
 
 func triggerPipeline(c Contact) error {
-	url := "https://api.github.com/repos/kawtherbt/Go-sample/dispatches"
+	url := "https://github.com/repos/kawtherbt/Go-sample/dispatches"
 
 	payloadMap := map[string]interface{}{
 		"event_type": "form_submitted",
