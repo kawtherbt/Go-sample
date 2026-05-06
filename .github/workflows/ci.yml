@@ -28,4 +28,4 @@ jobs:
           echo "Email: ${{ github.event.client_payload.email }}"
           echo "Message: ${{ github.event.client_payload.message }}"
 
-      - run: docker build -t go-form .
+      - run: docker build -t go-form .  
