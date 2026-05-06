@@ -1,63 +1,63 @@
 package main
 
 import (
-	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/google/go-github/v85/github"
+	"golang.org/x/oauth2"
 )
 
+// Contact struct (form data)
 type Contact struct {
 	Name    string `json:"name"`
 	Email   string `json:"email"`
 	Message string `json:"message"`
 }
 
+// Trigger GitHub Actions pipeline using go-github
 func triggerPipeline(c Contact) error {
-	url := "https://github.com/repos/kawtherbt/Go-sample/dispatches"
+	ctx := context.Background()
 
-	payloadMap := map[string]interface{}{
-		"event_type": "form_submitted",
-		"client_payload": map[string]string{
-			"name":    c.Name,
-			"email":   c.Email,
-			"message": c.Message,
-		},
+	// 1. Setup Authentication
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: os.Getenv("TOKEN")}, // 👈 keep env, not hardcoded
+	)
+	tc := oauth2.NewClient(ctx, ts)
+
+	// 2. Create the GitHub Client
+	client := github.NewClient(tc)
+
+	// 3. Trigger repository_dispatch (instead of Get)
+	payload := map[string]interface{}{
+	"name":    c.Name,
+	"email":   c.Email,
+	"message": c.Message,
 	}
 
-	payloadBytes, _ := json.Marshal(payloadMap)
-
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadBytes))
+	jsonPayload, err := json.Marshal(payload)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to marshal payload: %v", err)
 	}
 
-	token := os.Getenv("TOKEN")
-	if token == "" {
-		return fmt.Errorf("TOKEN not set")
+	dispatch := github.DispatchRequestOptions{
+		EventType:     "form_submitted",
+		ClientPayload: (*json.RawMessage)(&jsonPayload),
 	}
 
-	req.Header.Set("Accept", "application/vnd.github+json")
-	req.Header.Set("Authorization", "Bearer "+token)
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	_,_, err = client.Repositories.Dispatch(ctx, "kawtherbt", "Go-sample", dispatch)
 	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode >= 300 {
-		return fmt.Errorf("GitHub API returned status: %s", resp.Status)
+		return fmt.Errorf("error triggering pipeline: %v", err)
 	}
 
 	return nil
 }
 
-// form sub
+// Handle form submission
 func contactHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST allowed", http.StatusMethodNotAllowed)
@@ -67,13 +67,15 @@ func contactHandler(w http.ResponseWriter, r *http.Request) {
 	var c Contact
 	err := json.NewDecoder(r.Body).Decode(&c)
 	if err != nil {
-		http.Error(w, "Invalid request", http.StatusBadRequest)
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
+	// Log form submission
 	fmt.Printf("New message:\nName: %s\nEmail: %s\nMessage: %s\n\n",
-		c.Name, c.Email, c.Message) //log
+		c.Name, c.Email, c.Message)
 
+	// Trigger pipeline
 	err = triggerPipeline(c)
 	if err != nil {
 		log.Println("Error triggering pipeline:", err)
@@ -83,19 +85,17 @@ func contactHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/plain")
-	w.Write([]byte("Message received and pipeline triggered "))
+	w.Write([]byte("Message received and pipeline triggered"))
 }
 
 func main() {
+	// Serve static files (HTML, CSS)
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/", fs)
 
+	// API endpoint
 	http.HandleFunc("/contact", contactHandler)
 
 	fmt.Println("Server running on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
-
-
-
-
