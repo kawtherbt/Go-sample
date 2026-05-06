@@ -16,7 +16,7 @@ type Contact struct {
 }
 
 func triggerPipeline(c Contact) error {
-	url := "https://api.github.com/kawtherbt/Go-sample/dispatches"
+	url := "https://api.github.com/repos/kawtherbt/Go-sample/dispatches"
 
 	payloadMap := map[string]interface{}{
 		"event_type": "form_submitted",
@@ -34,13 +34,13 @@ func triggerPipeline(c Contact) error {
 		return err
 	}
 
-	token := os.Getenv("GITHUB_TOKEN")
+	token := os.Getenv("TOKEN")
 	if token == "" {
-		return fmt.Errorf("GITHUB_TOKEN not set")
+		return fmt.Errorf("TOKEN not set")
 	}
 
 	req.Header.Set("Accept", "application/vnd.github+json")
-	req.Header.Set("Authorization", "Bearer "+"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")
+	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -83,7 +83,7 @@ func contactHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/plain")
-	w.Write([]byte("Message received and pipeline triggered 🚀"))
+	w.Write([]byte("Message received and pipeline triggered "))
 }
 
 func main() {

@@ -1,10 +1,8 @@
-name: Go CI 
-env:
-  GITHUB_TOKEN: ${{ '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' }}
+name: Go CI
+
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   repository_dispatch:
     types: [form_submitted]
 
@@ -13,22 +11,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5  
+      - uses: actions/setup-go@v5
         with:
           go-version: "1.22"
 
-      - name: Install dependencies
-        run: go mod tidy
+      - run: go mod tidy
+      - run: go build -v ./...
+      - run: go test ./... || true
 
-      - name: Build Go app
-        run: go build -v ./...
+      - name: Show form submission
+        if: github.event_name == 'repository_dispatch'
+        run: |
+          echo "Name: ${{ github.event.client_payload.name }}"
+          echo "Email: ${{ github.event.client_payload.email }}"
+          echo "Message: ${{ github.event.client_payload.message }}"
 
-      - name: Run tests
-        run: go test ./... || true
-
-      - name: Build Docker image
-        run: docker build -t go-form .
+      - run: docker build -t go-form .
