@@ -12,27 +12,26 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// Contact struct (form data)
 type Contact struct {
 	Name    string `json:"name"`
 	Email   string `json:"email"`
 	Message string `json:"message"`
 }
 
-// Trigger GitHub Actions pipeline using go-github
+// Trigger ci bel go github
 func triggerPipeline(c Contact) error {
 	ctx := context.Background()
 
-	// 1. Setup Authentication
+	// Auth
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: "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"}, 
 	)
 	tc := oauth2.NewClient(ctx, ts)
 
-	// 2. Create the GitHub Client
+	
 	client := github.NewClient(tc)
 
-	// 3. Trigger repository_dispatch (instead of Get)
+	// 3. Trigger repo dispatch 
 	payload := map[string]interface{}{
 	"name":    c.Name,
 	"email":   c.Email,
@@ -57,7 +56,7 @@ func triggerPipeline(c Contact) error {
 	return nil
 }
 
-// Handle form submission
+// form sub
 func contactHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST allowed", http.StatusMethodNotAllowed)
@@ -71,7 +70,7 @@ func contactHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Log form submission
+	//Log form 
 	fmt.Printf("New message:\nName: %s\nEmail: %s\nMessage: %s\n\n",
 		c.Name, c.Email, c.Message)
 

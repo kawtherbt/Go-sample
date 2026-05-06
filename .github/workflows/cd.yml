@@ -1,0 +1,66 @@
+name: Go CD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+     
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      
+      - name: Install kind
+        run: |
+          curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
+          chmod +x ./kind
+          sudo mv ./kind /usr/local/bin/kind
+
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+
+      - name: Install helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      
+      - name: Create Kind cluster
+        run: |
+          kind create cluster --name go-sample-cluster
+
+      - name: Verify cluster
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+
+     
+      - name: Create namespace
+        run: |
+          kubectl create namespace go-sample-argocd || true
+
+     
+      - name: Install ArgoCD
+        run: |
+          helm repo add argo https://argoproj.github.io/argo-helm
+          helm repo update
+          helm install argocd argo/argo-cd -n go-sample-argocd
+
+      - name: Wait for ArgoCD pods
+        run: |
+          kubectl get pods -n go-sample-argocd
+          kubectl wait --for=condition=ready pod --all -n go-sample-argocd --timeout=300s
+
+     
+      - name: Get ArgoCD password
+        run: |
+          kubectl get secret argocd-initial-admin-secret -n go-sample-argocd -o jsonpath="{.data.password}" | base64 -d
