@@ -1,6 +1,6 @@
 module sample
 
-go 1.25.0
+go 1.22.0
 
 require (
 	github.com/google/go-github/v85 v85.0.0 // indirect
